@@ -1,0 +1,63 @@
+# Documentação do Projeto Serverless para Envio de Alertas
+1. Introdução
+Este documento descreve a implementação de uma função serverless que monitora logs em um ambiente de nuvem e envia notificações quando detecta erros críticos. 
+O objetivo é fornecer uma visão clara da arquitetura, das decisões técnicas tomadas e da integração dos serviços.
+
+2. Arquitetura do Projeto
+2.1. Visão Geral da Arquitetura
+A solução foi implementada utilizando a AWS e inclui os seguintes componentes principais:
+
+AWS Lambda: Para executar a função serverless que processa os logs e envia alertas.
+Amazon CloudWatch Logs: Para armazenar e monitorar os logs gerados pela aplicação.
+Amazon SNS (Simple Notification Service): Para enviar notificações quando um erro crítico é detectado.
+Amazon IAM: Para gerenciar as permissões necessárias para que a função Lambda acesse os outros serviços.
+2.2. Decisões Técnicas
+Uso do AWS Lambda: A escolha do Lambda permite a execução de código em resposta a eventos, sem a necessidade de gerenciar servidores. Isso garante escalabilidade e eficiência de custo.
+Integração com CloudWatch: A função Lambda é acionada por logs do CloudWatch, permitindo um monitoramento contínuo das operações da aplicação.
+Notificações via SNS: A utilização do SNS para envio de notificações facilita a integração com outros serviços, além de permitir que diferentes tipos de notificações sejam enviadas (email, SMS, etc.).
+3. Fluxo de Trabalho
+3.1. Monitoração de Logs
+Geração de Logs:
+A aplicação em execução gera logs que são enviados para o Amazon CloudWatch Logs.
+Acionamento da Função Lambda:
+A função Lambda é configurada para ser acionada sempre que novos logs são gerados no CloudWatch. Isso é feito através de uma regra de evento do CloudWatch.
+3.2. Processamento e Notificação
+Processamento de Logs:
+
+Quando acionada, a função Lambda analisa os logs recebidos, procurando por padrões específicos que indiquem erros críticos.
+Envio de Alertas:
+
+Se um erro crítico for detectado, a função Lambda utiliza o Amazon SNS para enviar uma notificação para os destinatários configurados.
+4. Implementação da Função Serverless
+4.1. Código da Função Lambda
+Aqui está um exemplo básico de como a função Lambda pode ser implementada:
+
+import json
+import boto3
+
+def lambda_handler(event, context):
+    sns = boto3.client('sns')
+    for record in event['Records']:
+        # Processar os logs
+        log_data = json.loads(record['Sns']['Message'])
+        
+        # Verificar se há um erro crítico
+        if 'ERROR' in log_data['level']:
+            # Enviar notificação
+            message = f"Erro crítico encontrado: {log_data['message']}"
+            sns.publish(
+                TopicArn='arn:aws:sns:us-east-1:123456789012:my-alerts',
+                Message=message,
+                Subject='Alerta de Erro Crítico'
+            )
+    return {
+        'statusCode': 200,
+        'body': json.dumps('Processamento concluído.')
+    }
+
+
+4.2. Configuração de Permissões
+A função Lambda deve ter permissões para acessar o CloudWatch Logs e o SNS. Isso é feito criando uma política IAM que é anexada à função.
+5. Conclusão
+A solução implementada proporciona um mecanismo eficiente para monitorar logs e enviar alertas em caso de erros críticos. 
+A arquitetura serverless permite que a aplicação seja escalável e de baixo custo, enquanto a integração entre os serviços da AWS garante um fluxo de trabalho automatizado e contínuo.
