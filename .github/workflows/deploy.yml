@@ -30,7 +30,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: your_dockerhub_username/my-python-k8s-app:latest  # Substitua pelo seu nome de usuário do Docker Hub
+          tags: guilaunn/kubernets:latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -44,4 +44,4 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl set image deployment/my-deployment my-container=your_dockerhub_username/my-python-k8s-app:latest --record  # Altere para o seu deployment e container
+          kubectl set image deployment/my-deployment my-container=guilaunn/kubernets-app:latest --record
