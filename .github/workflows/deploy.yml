@@ -21,8 +21,8 @@ jobs:
 
       - name: Build and Push Docker image
         run: |
-          docker build -t <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/my-app:latest .
-          docker push <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/my-app:latest
+          docker build -t <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/kubernets:latest .
+          docker push <aws_account_id>.dkr.ecr.us-east-1.amazonaws.com/kubernets:latest
 
   deploy:
     runs-on: ubuntu-latest
